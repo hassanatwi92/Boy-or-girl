@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مفاجأة</title>
+<style>
+:root{--blue:#5aa9f0;--pinkbg:#f06292;--box:#fff;--lid:#f3e5f5;--rib:#ba68c8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--blue:#2f6db0;--pinkbg:#b83d6a;color-scheme:dark}}
+:root[data-theme="dark"]{--blue:#2f6db0;--pinkbg:#b83d6a;color-scheme:dark}
+html,body{height:100%;margin:0}
+body{background:var(--blue);color:#fff;font-family:Georgia,"Times New Roman","Geeza Pro",Tahoma,serif;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;-webkit-tap-highlight-color:transparent;text-shadow:0 1px 6px rgba(0,0,0,.25)}
+.pinkhalf{position:fixed;top:0;bottom:0;right:0;left:50%;background:var(--pinkbg);transition:left 1.4s cubic-bezier(.7,0,.2,1)}
+body.all .pinkhalf{left:0}
+.stage{width:100%;max-width:420px;padding:20px;position:relative;z-index:2}
+h1{font-size:2rem;margin:0 0 6px;font-weight:normal}
+p{margin:0 0 28px;opacity:.95}
+#gift{cursor:pointer;width:180px;height:180px;margin:0 auto;position:relative;animation:wiggle 2s infinite}
+.box{position:absolute;bottom:0;left:10px;width:160px;height:110px;background:var(--box);border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.lid{position:absolute;top:30px;left:0;width:180px;height:44px;background:var(--lid);border-radius:6px;transition:transform .9s ease,opacity .9s}
+.rib{position:absolute;left:50%;width:26px;margin-left:-13px;top:0;bottom:0;background:var(--rib)}
+.bow{position:absolute;top:-14px;left:50%;margin-left:-20px;font-size:2.2rem}
+#gift.open{animation:none}
+#gift.open .lid{transform:translateY(-120px) rotate(-18deg);opacity:0}
+@keyframes wiggle{0%,100%{transform:rotate(0)}8%{transform:rotate(-4deg)}16%{transform:rotate(4deg)}24%{transform:rotate(0)}}
+#heart{font-size:5rem;display:none;animation:beat .4s infinite}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.15)}}
+#reveal{display:none}
+#reveal .big{font-size:2.6rem;margin:10px 0}
+#reveal .name{font-size:3.4rem;margin:0}
+#reveal .sub{margin-top:14px;font-size:1.1rem}
+.fade{animation:fade 1.4s both}
+@keyframes fade{from{opacity:0;transform:translateY(16px) scale(.9)}to{opacity:1;transform:none}}
+.fall{position:fixed;top:-30px;font-size:1.6rem;animation:fall linear forwards;pointer-events:none;z-index:3}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="pinkhalf"></div>
+<div class="stage">
+  <div id="intro">
+    <h1 dir="rtl">مفاجأة صغيرة…</h1>
+    <p dir="rtl">اضغط على الهدية لتعرف</p>
+    <div id="gift" role="button" aria-label="افتح الهدية">
+      <div class="box"><div class="rib"></div></div>
+      <div class="lid"><div class="rib"></div><div class="bow">🎀</div></div>
+    </div>
+  </div>
+  <div id="heart">💗</div>
+  <div id="listen" style="display:none"><p dir="rtl" style="margin-top:14px">اسمع…</p></div>
+  <div id="reveal">
+    <div class="big fade">It’s a girl! 🎀</div>
+    <h2 class="name fade" style="animation-delay:.4s">Celine</h2>
+    <div class="sub fade" style="animation-delay:.9s"><span dir="rtl">أهلاً بكِ في هذا العالم يا صغيرتنا 💕</span></div>
+  </div>
+</div>
+<script>
+var ctx=null,beatTimer=null;
+function thump(t,f,v){var o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(40,t+.12);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.015);g.gain.exponentialRampToValueAtTime(0.0001,t+.14);o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+.16)}
+function beat(){var t=ctx.currentTime;thump(t,95,.9);thump(t+.17,80,.6)}
+function startBeat(){try{var AC=window.AudioContext||window.webkitAudioContext;ctx=new AC();if(ctx.resume)ctx.resume();beat();beatTimer=setInterval(beat,420)}catch(e){}}
+function stopBeat(){clearInterval(beatTimer)}
+function confetti(){var e=["🎀","💗","🌸","✨","🎈","💕"];for(var i=0;i<42;i++){(function(i){setTimeout(function(){var s=document.createElement("div");s.className="fall";s.textContent=e[i%e.length];s.style.left=Math.random()*100+"vw";s.style.animationDuration=(3+Math.random()*3)+"s";document.body.appendChild(s);setTimeout(function(){s.remove()},6500)},i*90)})(i)}}
+var started=false;
+document.getElementById("gift").addEventListener("click",function(){
+  if(started)return;started=true;
+  this.classList.add("open");startBeat();
+  setTimeout(function(){document.getElementById("intro").style.display="none";document.getElementById("heart").style.display="block";document.getElementById("listen").style.display="block"},900);
+  setTimeout(function(){stopBeat();document.getElementById("heart").style.display="none";document.getElementById("listen").style.display="none";document.body.classList.add("all");document.getElementById("reveal").style.display="block";confetti()},6500);
+});
+</script>
+</body>
+</html>
